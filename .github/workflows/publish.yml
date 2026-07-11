@@ -27,20 +27,20 @@ jobs:
         run: |
           pip install jupyter nbconvert pypdf pandas numpy matplotlib seaborn scipy scikit-learn
 
-      - name: Convert notebook to HTML
+      - name: Execute and convert notebook
         run: |
           jupyter nbconvert \
             --to html \
+            --execute \
+            --ExecutePreprocessor.timeout=1800 \
             --output index.html \
             checkpoint3_skeleton.ipynb
           # NOTE: rename the input file above to match your final notebook name once
           # you replace checkpoint3_skeleton.ipynb with your finished notebook.
           #
-          # NOTE: --execute is intentionally omitted for now because rows.json
-          # (the dataset) isn't committed to this repo yet. Once the data is
-          # available at runtime (committed, via Git LFS, or downloaded from
-          # the Socrata API — see GITHUB_PAGES_SETUP.md), add --execute back
-          # so the published page shows real, up-to-date outputs.
+          # The notebook downloads rows.json (~1 GB) from the NYC Open Data API
+          # at runtime rather than reading a committed file, so the timeout is
+          # generous (30 min) to cover the download + full pipeline execution.
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

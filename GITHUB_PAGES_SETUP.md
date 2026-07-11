@@ -80,10 +80,7 @@ If you already have a `<username>.github.io` repo for something else, use a sepa
 
 ## Important Notes
 
-- `rows.json` **cannot be committed** if it is large (GitHub hard-limits files at 100 MB). Options:
-  - Download it at notebook runtime via the Socrata API (see commented code block below).
-  - Use [Git LFS](https://git-lfs.com/) if the file is under ~500 MB.
-  - Host it on a public Google Drive / Dropbox and download with `gdown` in the notebook.
+- `rows.json` is **not committed** — it's ~1 GB, far over GitHub's 100 MB file limit. The notebook downloads it directly from the NYC Open Data API on first run and caches it locally (see the load cell + `.gitignore`). The GitHub Actions workflow does the same download on every CI run before executing the notebook.
 
 - **Rename the notebook** from `checkpoint3_skeleton.ipynb` to something descriptive before you submit. Update the `publish.yml` `--output index.html` line to match.
 
@@ -93,17 +90,3 @@ If you already have a `<username>.github.io` repo for something else, use a sepa
   open index.html
   ```
 
-## Socrata API download (avoids committing a large JSON file)
-
-Add this at the top of your notebook's data-loading cell instead of reading from a local file:
-
-```python
-import urllib.request, json
-
-API_URL = "https://data.cityofnewyork.us/resource/h9gi-nx95.json?$limit=500000"
-with urllib.request.urlopen(API_URL) as response:
-    records = json.load(response)
-df = pd.DataFrame(records)
-```
-
-Adjust `$limit` as needed (max is 1,000,000 per query without an app token).
